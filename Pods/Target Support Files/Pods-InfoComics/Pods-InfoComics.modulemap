@@ -1,0 +1,6 @@
+framework module Pods_InfoComics {
+  umbrella header "Pods-InfoComics-umbrella.h"
+
+  export *
+  module * { export * }
+}

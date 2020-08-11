@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19F96" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CharacterInfo" representedClassName="CharacterInfo" syncable="YES">
+        <attribute name="descript" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="covers" toMany="YES" deletionRule="Cascade" destinationEntity="Cover" inverseName="character" inverseEntity="Cover"/>
+        <relationship name="images" toMany="YES" deletionRule="Cascade" destinationEntity="Img" inverseName="character" inverseEntity="Img"/>
+    </entity>
+    <entity name="Cover" representedClassName="Cover" syncable="YES">
+        <attribute name="image" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+        <relationship name="character" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CharacterInfo" inverseName="covers" inverseEntity="CharacterInfo"/>
+    </entity>
+    <entity name="Img" representedClassName="Img" syncable="YES">
+        <attribute name="image" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+        <relationship name="character" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CharacterInfo" inverseName="images" inverseEntity="CharacterInfo"/>
+    </entity>
+    <elements>
+        <element name="CharacterInfo" positionX="2723.61328125" positionY="3801.92578125" width="183.6796875" height="103"/>
+        <element name="Cover" positionX="2969.3671875" positionY="3763.1875" width="151.62109375" height="88"/>
+        <element name="Img" positionX="2862" positionY="3816" width="128" height="88"/>
+    </elements>
+</model>

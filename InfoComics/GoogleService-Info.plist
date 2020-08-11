@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>392825236861-m3f50g3fidvjml5f14lpddhgi5214q7o.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.392825236861-m3f50g3fidvjml5f14lpddhgi5214q7o</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCvQqlyR3mmLYRsLIQ37q-R_mmAuBjSPDs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>392825236861</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.pjcyber.InfoComics</string>
+	<key>PROJECT_ID</key>
+	<string>infocomics-cd832</string>
+	<key>STORAGE_BUCKET</key>
+	<string>infocomics-cd832.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:392825236861:ios:f328a3b6a62446bb9e7014</string>
+	<key>DATABASE_URL</key>
+	<string>https://infocomics-cd832.firebaseio.com</string>
+</dict>
+</plist>
