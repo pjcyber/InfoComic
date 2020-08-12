@@ -24,17 +24,25 @@ class LoginViewController: BaseViewController {
     
     // MARK: - Actions
     @IBAction func onLoginClick(_ sender: Any) {
-        guard let email = emailTextField.text, let pass = passwordTextField.text else {
-            showErrorAlert(title: "Error", message:  "Please enter valid credentials")
-            return
-        }
-        let auth = FirebaseAuthViewModel(email: email, pass: pass)
-        auth.doLogin(completionBlock: { (result, error) in
-            if result {
-                self.performSegue(withIdentifier: "goToHome", sender: nil)
-            } else {
-                self.showErrorAlert(title: "Error", message:  "Invalid Credentials")
+        if isConnectedToNetwork() {
+            emailTextField.isEnabled = false
+            passwordTextField.isEnabled = false
+            guard let email = emailTextField.text, let pass = passwordTextField.text else {
+                showErrorAlert(title: "Error", message:  "Please enter valid credentials")
+                return
             }
-        })
+            let auth = FirebaseAuthViewModel(email: email, pass: pass)
+            auth.doLogin(completionBlock: { (result, error) in
+                if result {
+                    self.performSegue(withIdentifier: "goToHome", sender: nil)
+                } else {
+                    self.showErrorAlert(title: "Error", message:  "Invalid Credentials")
+                }
+                self.emailTextField.isEnabled = true
+                self.passwordTextField.isEnabled = true
+            })
+        } else {
+            self.showErrorAlert(title: "Error", message: "No Internet Connection")
+        }
     }
 }

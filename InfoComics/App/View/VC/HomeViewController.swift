@@ -19,6 +19,7 @@ class HomeViewController: BaseViewController, UISearchBarDelegate {
     @IBOutlet weak var characterDescription: UITextView!
     @IBOutlet weak var searchView: UISearchBar!
     @IBOutlet weak var carouselContainer: UIView!
+    @IBOutlet weak var progressBar: UIActivityIndicatorView!
     
     // MARK: - Constants
     let margin: CGFloat = 20
@@ -64,66 +65,84 @@ class HomeViewController: BaseViewController, UISearchBarDelegate {
     
     // MARK: - Actions
     @IBAction func saveCharacter(_ sender: UIButton) {
-        if charaterSaved {
-            saveButton.setImage(UIImage(named: "unfavorite"), for: .normal)
-            CharacterViewModel.deleteData(name: characterName.text!)
-            charaterSaved = false
-            
-        } else {
-            charaterSaved = true
-            saveButton.setImage(UIImage(named: "favorite"), for: .normal)
-            CharacterViewModel.saveData(name: characterName.text!, description: characterDescription.text, uris: imageUriArray, characterImage: characterImage.image!.pngData()!, covers: dataArray)
+        if dataArray.count > 0 && imageUriArray.count > 0 {
+            if charaterSaved {
+                saveButton.setImage(UIImage(named: "unfavorite"), for: .normal)
+                CharacterViewModel.deleteData(name: characterName.text!)
+                charaterSaved = false
+                
+            } else {
+                charaterSaved = true
+                saveButton.setImage(UIImage(named: "favorite"), for: .normal)
+                CharacterViewModel.saveData(name: characterName.text!, description: characterDescription.text, uris: imageUriArray, characterImage: characterImage.image!.pngData()!, covers: dataArray)
+            }
         }
     }
     
     func setCharacterImage(imageURL: String) {
-        characterImageSubscriber = CharacterViewModel.getCharacterImage(imageURI: imageURL)
-            .sink(receiveCompletion: {error in }, receiveValue: {data in
-                self.characterImage.image = UIImage(data: data)
-            })
+        if isConnectedToNetwork() {
+            characterImageSubscriber = CharacterViewModel.getCharacterImage(imageURI: imageURL)
+                .sink(receiveCompletion: {error in }, receiveValue: {data in
+                    self.characterImage.image = UIImage(data: data)
+                })
+        } else {
+            self.showErrorAlert(title: "Error", message: "No Internet Connection")
+        }
     }
     
     func setComicCovers(comicsUris: [String]) {
-        comicCoversSubscriber = CharacterViewModel.getComicCovers(comicsCovers: comicsUris)
-            .sink(receiveCompletion: { (error) in }, receiveValue: { covers in
-                self.dataArray.append(contentsOf: covers)
-                self.comicCarousel.reloadData()
-            })
+        if isConnectedToNetwork() {
+            comicCoversSubscriber = CharacterViewModel.getComicCovers(comicsCovers: comicsUris)
+                .sink(receiveCompletion: { (error) in }, receiveValue: { covers in
+                    self.dataArray.append(contentsOf: covers)
+                    self.comicCarousel.reloadData()
+                    self.disableLoadingMode()
+                })
+        } else {
+            self.showErrorAlert(title: "Error", message: "No Internet Connection")
+        }
     }
     
     // MARK: - UISearchBar Delegate
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchingMode = true
-        characterInfoSubscriber = CharacterViewModel.getCharacter(character: searchText)
-            .sink(receiveCompletion: {error in }, receiveValue: { characterData in
-                if let characterData = characterData {
-                    self.imageUriArray = []
-                    self.dataArray = []
-                    
-                    self.characterName.text = characterData.name
-                    self.characterDescription.text = characterData.description
-                    self.setCharacterImage(imageURL: characterData.imageURI)
-                    self.imageUriArray.append(characterData.imageURI)
-                    self.setComicCovers(comicsUris: characterData.comics)
-                    self.imageUriArray.append(contentsOf: characterData.comics)
-                    
-                    if CharacterViewModel.exists(name: characterData.name) {
-                        self.charaterSaved.toggle()
-                        self.saveButton.setImage(UIImage(named: "favorite"), for: .normal)
+        enableLoadingMode()
+        if isConnectedToNetwork() {
+            characterInfoSubscriber = CharacterViewModel.getCharacter(character: searchText)
+                .sink(receiveCompletion: {error in }, receiveValue: { characterData in
+                    if let characterData = characterData {
+                        self.imageUriArray = []
+                        self.dataArray = []
+                        
+                        self.characterName.text = characterData.name
+                        self.characterDescription.text = characterData.description
+                        self.setCharacterImage(imageURL: characterData.imageURI)
+                        self.imageUriArray.append(characterData.imageURI)
+                        self.setComicCovers(comicsUris: characterData.comics)
+                        self.imageUriArray.append(contentsOf: characterData.comics)
+                        
+                        if CharacterViewModel.exists(name: characterData.name) {
+                            self.charaterSaved.toggle()
+                            self.saveButton.setImage(UIImage(named: "favorite"), for: .normal)
+                        } else {
+                            self.charaterSaved.toggle()
+                            self.saveButton.setImage(UIImage(named: "unfavorite"), for: .normal)
+                        }
                     } else {
-                        self.charaterSaved.toggle()
-                        self.saveButton.setImage(UIImage(named: "unfavorite"), for: .normal)
+                        self.searchingMode = false
                     }
-                } else {
-                    self.searchingMode = false
-                }
-            })
+                    
+                })
+        } else {
+            self.showErrorAlert(title: "Error", message: "No Internet Connection")
+        }
+        
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar)  {
         searchBar.resignFirstResponder()
         if (!searchingMode && searchBar.text?.count ?? 0 > 0) {
             self.showErrorAlert(title: "Error", message: "Character Not found")
+            self.disableLoadingMode()
         }
     }
     
@@ -132,6 +151,23 @@ class HomeViewController: BaseViewController, UISearchBarDelegate {
         characterInfoSubscriber?.cancel()
         comicCoversSubscriber?.cancel()
         characterImageSubscriber?.cancel()
+    }
+    
+    func enableLoadingMode() {
+        searchingMode = true
+        progressBar.startAnimating()
+        characterDescription.text = ""
+        characterName.text = ""
+        saveButton.isHidden = true
+        characterImage.image = UIImage(named: "empty_Image")
+        dataArray = []
+        comicCarousel.reloadData()
+    }
+    
+    func disableLoadingMode() {
+        self.progressBar.isHidden = true
+        self.saveButton.isHidden = false
+        self.progressBar.stopAnimating()
     }
 }
 

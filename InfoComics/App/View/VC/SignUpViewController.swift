@@ -27,17 +27,27 @@ class SignUpViewController: BaseViewController {
     
     // MARK: - Actions
     @IBAction func onSignUpClick(_ sender: Any) {
-        if passTextField.text == confirmPassTextField.text, let email = emailTextField.text, let pass = passTextField.text {
-            let auth = FirebaseAuthViewModel(email: email, pass: pass)
-            auth.createUser { (result) in
-                if result {
-                    self.showErrorAlert(title: "SignUp", message: "UserRegister")
-                } else {
-                    self.showErrorAlert(title: "Error", message: "error trying to register user")
+        if isConnectedToNetwork() {
+            emailTextField.isEnabled = false
+            passTextField.isEnabled = false
+            confirmPassTextField.isEnabled = false
+            if passTextField.text == confirmPassTextField.text, let email = emailTextField.text, let pass = passTextField.text {
+                let auth = FirebaseAuthViewModel(email: email, pass: pass)
+                auth.createUser { (result) in
+                    if result {
+                        self.showErrorAlert(title: "SignUp", message: "UserRegister")
+                    } else {
+                        self.showErrorAlert(title: "Error", message: "error trying to register user")
+                    }
+                    self.emailTextField.isEnabled = true
+                    self.passTextField.isEnabled = true
+                    self.confirmPassTextField.isEnabled = true
                 }
+            } else {
+                showErrorAlert(title: "Error", message: "insert user and password")
             }
         } else {
-            showErrorAlert(title: "Error", message: "insert user and password")
+            self.showErrorAlert(title: "Error", message: "No Internet Connection")
         }
     }
 }
